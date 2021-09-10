@@ -29,7 +29,7 @@ final class Route implements RouteInterface
     public function __construct(array $methods, string $pattern, callable $callback)
     {
         $this->methods = $methods;
-        $this->pattern = $pattern;
+        $this->pattern = trim($pattern, '/ ');
         $this->callback = $callback;
     }
 
@@ -40,7 +40,7 @@ final class Route implements RouteInterface
      */
     public function check(string $method, string $pattern): bool
     {
-        return $pattern === $this->pattern && in_array($method, $this->methods, true);
+        return trim($pattern, '/ ') === $this->pattern && in_array($method, $this->methods, true);
     }
 
     /**
