@@ -16,14 +16,18 @@ final class Router
     /**
      * @param string $method
      * @param string $pattern
+     * @throws RouterException
      */
     public function handle(string $method, string $pattern): void
     {
+        $method = strtoupper($method);
+        if (!in_array($method, RouteInterface::METHODS)) {
+            throw new RouterException('Unsupported method');
+        }
         /** @var RouteInterface $route */
         foreach ($this->routes as $route) {
             if ($route->check($method, $pattern)) {
-                $callback = $route->getCallback();
-                $callback();
+                call_user_func($route->getCallback());
             }
         }
     }
@@ -82,16 +86,7 @@ final class Router
      */
     public function any(string $pattern, callable $callback): void
     {
-        $this->routes[] = new Route([
-            RouteInterface::METHOD_GET,
-            RouteInterface::METHOD_POST,
-            RouteInterface::METHOD_PUT,
-            RouteInterface::METHOD_PATCH,
-            RouteInterface::METHOD_DELETE,
-        ],
-            $pattern,
-            $callback
-        );
+        $this->routes[] = new Route(RouteInterface::METHODS, $pattern, $callback);
     }
 
     /**
@@ -100,16 +95,7 @@ final class Router
      */
     public function fallback(callable $callback): void
     {
-        $this->routes[] = new Route([
-            RouteInterface::METHOD_GET,
-            RouteInterface::METHOD_POST,
-            RouteInterface::METHOD_PUT,
-            RouteInterface::METHOD_PATCH,
-            RouteInterface::METHOD_DELETE,
-        ],
-            '.*',
-            $callback,
-        );
+        $this->routes[] = new Route(RouteInterface::METHODS, '.*', $callback);
     }
 
     /**
@@ -119,16 +105,9 @@ final class Router
      */
     private function validateMethods(array $methods): array
     {
-        $allMethods = [
-            RouteInterface::METHOD_GET,
-            RouteInterface::METHOD_POST,
-            RouteInterface::METHOD_PUT,
-            RouteInterface::METHOD_PATCH,
-            RouteInterface::METHOD_DELETE,
-        ];
         foreach ($methods as &$method) {
             $method = strtoupper($method);
-            if (!in_array($method, $allMethods, true)) {
+            if (!in_array($method, RouteInterface::METHODS, true)) {
                 throw new RouterException('Unsupported method');
             }
         }

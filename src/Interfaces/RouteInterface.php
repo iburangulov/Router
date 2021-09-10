@@ -10,6 +10,14 @@ interface RouteInterface
     const METHOD_PATCH = 'PATCH';
     const METHOD_DELETE = 'DELETE';
 
+    const METHODS = [
+        self::METHOD_GET,
+        self::METHOD_POST,
+        self::METHOD_PUT,
+        self::METHOD_PATCH,
+        self::METHOD_DELETE,
+    ];
+
     /**
      * @param string $method
      * @param string $pattern
